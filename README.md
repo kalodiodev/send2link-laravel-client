@@ -1,4 +1,4 @@
-# 2Ln.eu Url Shortener Laravel Client
+# 2ln.eu Url Shortener Laravel Client
 
 ## Installation
 
