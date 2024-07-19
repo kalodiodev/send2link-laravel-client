@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Auth\AuthenticationException;
 use Kalodiodev\Send2Link\Queries\ProjectsQuery;
+use Kalodiodev\Send2Link\Queries\ShortLinksQuery;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -29,6 +30,11 @@ class Client
     public function projects(): ProjectsQuery
     {
         return new ProjectsQuery($this);
+    }
+
+    public function shortLinks(string $projectUuid): ShortLinksQuery
+    {
+        return new ShortLinksQuery($this, $projectUuid);
     }
 
     protected function client(): PendingRequest
