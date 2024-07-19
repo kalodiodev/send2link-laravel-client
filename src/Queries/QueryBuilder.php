@@ -2,10 +2,13 @@
 
 namespace Kalodiodev\Send2Link\Queries;
 
+use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Collection;
 use Kalodiodev\Send2Link\Client;
+use Kalodiodev\Send2Link\Response\ItemResponse;
+use Kalodiodev\Send2Link\Response\PageResponse;
 
 abstract class QueryBuilder
 {
@@ -26,15 +29,13 @@ abstract class QueryBuilder
         $this->url = $client->getBaseUrl() . $this->apiUrl . "?";
     }
 
-    protected function addParameter($key, $value): void
-    {
-        $this->url .= $key . "=" . $value . "&";
-    }
-
     /**
      * Set Page and Page Size
+     *
+     * @param int $page the page number
+     * @param int $pageSize the page size
      */
-    public function page($page, $pageSize = 25): self
+    public function page(int $page, int $pageSize = 25): self
     {
         $this->addParameter('pageNumber', $page);
         $this->addParameter('pageSize', $pageSize);
@@ -43,12 +44,94 @@ abstract class QueryBuilder
     }
 
     /**
-     * Get Results
+     * Get page items
+     *
+     * @throws AuthenticationException
+     */
+    public function getAll(): PageResponse
+    {
+        $response = $this->getRequest();
+
+        if ($response->successful()) {
+            $projects = $this->parseItems($response->json($this->resultsKey));
+
+            return new PageResponse(
+                $response->status(),
+                $response->json('page'),
+                $response->json('size'),
+                $response->json('totalPages'),
+                $response->json('first'),
+                $response->json('last'),
+                $projects
+            );
+        }
+
+        return new PageResponse($response->status(),0,0,0, true, true, collect());
+    }
+
+    /**
+     * Get Item by UUID
+     *
+     * @throws AuthenticationException
+     */
+    public function getByUuid(string $uuid): ItemResponse
+    {
+        $this->url = $this->client->getBaseUrl() . $this->apiUrl . '/' . $uuid;
+
+        $response = $this->client->get($this->url);
+
+        $item = $this->parseItem($response->json());
+
+        return new ItemResponse($response->status(), $item);
+    }
+
+    /**
+     * Delete item
+     *
+     * @throws Exception
+     */
+    public function delete(string $uuid): void
+    {
+        $this->url = $this->client->getBaseUrl() . $this->apiUrl . '/' . $uuid;
+
+        $this->client->delete($this->url);
+    }
+
+    /**
+     * Add parameter to URL
+     *
+     * @param $key
+     * @param $value
+     * @return void
+     */
+    protected function addParameter($key, $value): void
+    {
+        $this->url .= $key . "=" . $value . "&";
+    }
+
+    /**
+     * Make POST Request
+     *
+     * @throws AuthenticationException
+     */
+    protected function postRequest($data): ItemResponse
+    {
+        $this->url = $this->client->getBaseUrl() . $this->apiUrl;
+
+        $response = $this->client->post($this->url, $data);
+
+        $project = $this->parseItem($response->json());
+
+        return new ItemResponse($response->status(), $project);
+    }
+
+    /**
+     * Make GET request
      *
      * @return Response
      * @throws AuthenticationException
      */
-    protected function performGet(): Response
+    protected function getRequest(): Response
     {
         $this->url = rtrim($this->url, '&');
 
@@ -56,35 +139,15 @@ abstract class QueryBuilder
     }
 
     /**
-     * Update
+     * Make Patch Request
      *
-     * @param array $data
-     * @return Response
      * @throws AuthenticationException
      */
-    public function put(array $data): Response
+    protected function patchRequest($uuid, $data): void
     {
-        $this->url = rtrim($this->url, '&');
+        $this->url = $this->client->getBaseUrl() . $this->apiUrl . '/' . $uuid;
 
-        return $this->client->put($this->url, $data);
-    }
-
-    /**
-     * Results collection
-     *
-     * @param callable|null $parser
-     * @return Collection|mixed
-     * @throws AuthenticationException
-     */
-    public function collection(Callable $parser = null): mixed
-    {
-        $results = $this->json();
-
-        if (! empty($this->resultsKey)) {
-            return $this->buildCollection($results, $parser);
-        }
-
-        return $this->parseItem($results);
+        $this->client->patch($this->url, $data);
     }
 
     /**
@@ -95,29 +158,7 @@ abstract class QueryBuilder
      */
     public function json(): mixed
     {
-        return $this->performGet()->json();
-    }
-
-    /**
-     * Build results collection
-     *
-     * @param array $results
-     * @param callable|null $itemCallback
-     * @return Collection
-     */
-    protected function buildCollection(array $results, callable $itemCallback = null): Collection
-    {
-        $collection = new Collection();
-
-        foreach ($results[$this->resultsKey] as $data) {
-            if ($itemCallback) {
-                $itemCallback($data);
-            }
-
-            $collection->add($this->parseItem($data));
-        }
-
-        return $collection;
+        return $this->getRequest()->json();
     }
 
     /**
@@ -130,6 +171,12 @@ abstract class QueryBuilder
         return rtrim($this->url, '&');
     }
 
+    /**
+     * Parse Items to Collection
+     *
+     * @param array $responseData
+     * @return Collection
+     */
     protected function parseItems(array $responseData): Collection
     {
         $items = [];

@@ -4,8 +4,8 @@ namespace Kalodiodev\Send2Link\Queries;
 
 use Illuminate\Auth\AuthenticationException;
 use Kalodiodev\Send2Link\Models\Project;
-use Kalodiodev\Send2Link\Response\ProjectResponse;
-use Kalodiodev\Send2Link\Response\ProjectsResponse;
+use Kalodiodev\Send2Link\Response\ItemResponse;
+use Kalodiodev\Send2Link\Response\PageResponse;
 
 class ProjectsQuery extends QueryBuilder
 {
@@ -13,84 +13,44 @@ class ProjectsQuery extends QueryBuilder
     protected string $resultsKey = 'content';
 
     /**
+     * Get all Projects
+     *
+     * @return PageResponse<Project>
      * @throws AuthenticationException
      */
-    public function getAll(): ProjectsResponse
+    public function getAll(): PageResponse
     {
-        $response = $this->performGet();
-
-        if ($response->successful()) {
-            $projects = $this->parseItems($response->json($this->resultsKey));
-
-            return new ProjectsResponse(
-                $response->status(),
-                $response->json('page'),
-                $response->json('size'),
-                $response->json('totalPages'),
-                $response->json('first'),
-                $response->json('last'),
-                $projects
-            );
-        }
-
-        return new ProjectsResponse($response->status(),0,0,0, true, true, collect());
+        return parent::getAll();
     }
 
     /**
+     * Create Project
+     *
+     * @return ItemResponse<Project>
      * @throws AuthenticationException
      */
-    public function getByUuid(string $uuid): ProjectResponse
+    public function create(string $name, string $description = null): ItemResponse
     {
-        $this->url = $this->client->getBaseUrl() . $this->apiUrl . '/' . $uuid;
-
-        $response = $this->client->get($this->url);
-
-        $project = $this->parseItem($response->json());
-
-        return new ProjectResponse($response->status(), $project);
-    }
-
-    /**
-     * @throws AuthenticationException
-     */
-    public function create(string $name, string $description = null): ProjectResponse
-    {
-        $this->url = $this->client->getBaseUrl() . $this->apiUrl;
-
-        $response = $this->client->post($this->url, [
+        return $this->postRequest([
             'name' => $name,
             'description' => $description
         ]);
-
-        $project = $this->parseItem($response->json());
-
-        return new ProjectResponse($response->status(), $project);
     }
 
     /**
+     * Update Project
+     *
      * @throws AuthenticationException
      */
     public function update(string $uuid, string $name, string|null $description = null): void
     {
-        $this->url = $this->client->getBaseUrl() . $this->apiUrl . '/' . $uuid;
-
-        $this->client->patch($this->url, [
+        $this->patchRequest($uuid, [
             'name' => $name,
             'description' => $description
         ]);
     }
 
-    /**
-     * @throws \Exception
-     */
-    public function delete(string $uuid): void
-    {
-        $this->url = $this->client->getBaseUrl() . $this->apiUrl . '/' . $uuid;
-
-        $this->client->delete($this->url);
-    }
-
-    protected function parseItem(array $item): mixed
+    protected function parseItem(array $item): Project
     {
         return new Project(
             $item['uuid'],
