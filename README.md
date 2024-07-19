@@ -3,6 +3,17 @@
 ## Installation
 
 ### Step 1. Install dependency
+Add repository to **composer.json**
+```json
+"repositories": [
+    {
+        "type": "git",
+        "url": "https://github.com/kalodiodev/send2link-laravel-client.git"
+    }
+]
+```
+
+Require package
 ```
 composer require kalodiodev/send2link-laravel-client
 ```
