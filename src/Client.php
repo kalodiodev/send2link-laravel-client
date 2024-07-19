@@ -11,8 +11,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Auth\AuthenticationException;
 use Kalodiodev\Send2Link\Queries\ProjectsQuery;
-use Kalodiodev\Send2Link\Response\ProjectResponse;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Client
@@ -20,62 +20,15 @@ class Client
     private string $server;
     private string $authorizationKey;
 
-    const PROJECTS_URL = '/api/v1/projects';
-
     public function __construct()
     {
         $this->server = config('send2link.server');
         $this->authorizationKey = config('send2link.authorization_key');
     }
 
-    /**
-     * @throws AuthenticationException
-     */
-    public function createProject(string $name, string $description): ProjectResponse
-    {
-        $response = $this->client()->post($this->getBaseUrl() . self::PROJECTS_URL, [
-            'name' => $name,
-            'description' => $description,
-        ]);
-
-        if ($response->clientError()) {
-            $this->throwClientError($response);
-        }
-
-        $project = new Models\Project(
-            $response->json()['uuid'],
-            $response->json()['name'],
-            $response->json()['description'],
-            $response->json()['createdAt'],
-            $response->json()['updatedAt']
-        );
-
-        return new ProjectResponse($response->status(), $project);
-    }
-
-    public function getProjects(): ProjectsQuery
+    public function projects(): ProjectsQuery
     {
         return new ProjectsQuery($this);
-    }
-
-    public function getProject(string $projectUuid)
-    {
-
-    }
-
-    public function deleteProject(string $projectUuid)
-    {
-
-    }
-
-    public function createShortLink(string $projectUuid, string $destination, boolean $enabled)
-    {
-
-    }
-
-    public function deleteShortLink(string $projectUuid, string $shortLinkUuid)
-    {
-
     }
 
     protected function client(): PendingRequest
@@ -112,9 +65,9 @@ class Client
      * @return Response
      * @throws AuthenticationException
      */
-    public function put($url, $data): Response
+    public function patch($url, $data): Response
     {
-        $response = $this->client()->put($url, $data);
+        $response = $this->client()->patch($url, $data);
 
         if ($response->clientError()) {
             Log::error($response);
@@ -131,14 +84,18 @@ class Client
     protected function throwClientError(Response $response)
     {
         if ($response->status() === ResponseAlias::HTTP_UNAUTHORIZED) {
-            throw new AuthenticationException($response->json()['message']);
+            throw new AuthenticationException(message: $response->body());
         }
 
         if ($response->status() === ResponseAlias::HTTP_NOT_FOUND) {
-            throw new NotFoundHttpException($response->json()['message']);
+            throw new NotFoundHttpException(message: $response->json('error'), code: $response->status());
         }
 
-        throw new Exception($response->json()['message']);
+        if ($response->status() === ResponseAlias::HTTP_CONFLICT) {
+            throw new ConflictHttpException(message: $response->json('error'), code: $response->status());
+        }
+
+        throw new Exception(message: $response->json('error'), code: $response->status());
     }
 
     /**
@@ -170,7 +127,7 @@ class Client
      */
     public function post(string $url, array $data): Response
     {
-        $response = $this->client()->put($url, $data);
+        $response = $this->client()->post($url, $data);
 
         if ($response->clientError()) {
             Log::error($response);

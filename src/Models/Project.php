@@ -6,11 +6,11 @@ class Project
 {
     private string $uuid;
     private string $name;
-    private string $description;
+    private string|null $description;
     private string $createdAt;
     private string $updatedAt;
 
-    public function __construct(string $uuid, string $name, string $description, string $createdAt, string $updatedAt)
+    public function __construct(string $uuid, string $name, string|null $description, string $createdAt, string $updatedAt)
     {
         $this->uuid = $uuid;
         $this->name = $name;

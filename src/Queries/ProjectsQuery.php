@@ -3,8 +3,8 @@
 namespace Kalodiodev\Send2Link\Queries;
 
 use Illuminate\Auth\AuthenticationException;
-use Illuminate\Http\Client\Response;
 use Kalodiodev\Send2Link\Models\Project;
+use Kalodiodev\Send2Link\Response\ProjectResponse;
 use Kalodiodev\Send2Link\Response\ProjectsResponse;
 
 class ProjectsQuery extends QueryBuilder
@@ -15,7 +15,7 @@ class ProjectsQuery extends QueryBuilder
     /**
      * @throws AuthenticationException
      */
-    public function get(): ProjectsResponse
+    public function getAll(): ProjectsResponse
     {
         $response = $this->performGet();
 
@@ -39,24 +39,42 @@ class ProjectsQuery extends QueryBuilder
     /**
      * @throws AuthenticationException
      */
-    public function create(string $name, string $description): Response
+    public function getByUuid(string $uuid): ProjectResponse
     {
-        $this->url = $this->client->getBaseUrl() . $this->apiUrl;
+        $this->url = $this->client->getBaseUrl() . $this->apiUrl . '/' . $uuid;
 
-        return $this->client->post($this->url, [
-            'name' => $name,
-            'description' => $description
-        ]);
+        $response = $this->client->get($this->url);
+
+        $project = $this->parseItem($response->json());
+
+        return new ProjectResponse($response->status(), $project);
     }
 
     /**
      * @throws AuthenticationException
      */
-    public function update(string $uuid, string $name, string $description): Response
+    public function create(string $name, string $description = null): ProjectResponse
+    {
+        $this->url = $this->client->getBaseUrl() . $this->apiUrl;
+
+        $response = $this->client->post($this->url, [
+            'name' => $name,
+            'description' => $description
+        ]);
+
+        $project = $this->parseItem($response->json());
+
+        return new ProjectResponse($response->status(), $project);
+    }
+
+    /**
+     * @throws AuthenticationException
+     */
+    public function update(string $uuid, string $name, string|null $description = null): void
     {
         $this->url = $this->client->getBaseUrl() . $this->apiUrl . '/' . $uuid;
 
-        return $this->client->put($this->url, [
+        $this->client->patch($this->url, [
             'name' => $name,
             'description' => $description
         ]);
@@ -65,11 +83,11 @@ class ProjectsQuery extends QueryBuilder
     /**
      * @throws \Exception
      */
-    public function delete(string $uuid): Response
+    public function delete(string $uuid): void
     {
         $this->url = $this->client->getBaseUrl() . $this->apiUrl . '/' . $uuid;
 
-        return $this->client->delete($this->url);
+        $this->client->delete($this->url);
     }
 
     protected function parseItem(array $item): mixed
