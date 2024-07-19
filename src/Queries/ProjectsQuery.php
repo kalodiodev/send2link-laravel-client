@@ -4,15 +4,36 @@ namespace Kalodiodev\Send2Link\Queries;
 
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Client\Response;
+use Kalodiodev\Send2Link\Models\Project;
+use Kalodiodev\Send2Link\Response\ProjectsResponse;
 
 class ProjectsQuery extends QueryBuilder
 {
-    protected string $apiUrl = 'api/v1/projects';
-    protected string $resultsKey = 'projects';
+    protected string $apiUrl = '/api/v1/projects';
+    protected string $resultsKey = 'content';
 
-    public function get(): Response
+    /**
+     * @throws AuthenticationException
+     */
+    public function get(): ProjectsResponse
     {
-        return $this->client->get($this->url);
+        $response = $this->performGet();
+
+        if ($response->successful()) {
+            $projects = $this->parseItems($response->json($this->resultsKey));
+
+            return new ProjectsResponse(
+                $response->status(),
+                $response->json('page'),
+                $response->json('size'),
+                $response->json('totalPages'),
+                $response->json('first'),
+                $response->json('last'),
+                $projects
+            );
+        }
+
+        return new ProjectsResponse($response->status(),0,0,0, true, true, collect());
     }
 
     /**
@@ -53,6 +74,12 @@ class ProjectsQuery extends QueryBuilder
 
     protected function parseItem(array $item): mixed
     {
-        return null;
+        return new Project(
+            $item['uuid'],
+            $item['name'],
+            $item['description'],
+            $item['createdAt'],
+            $item['updatedAt']
+        );
     }
 }

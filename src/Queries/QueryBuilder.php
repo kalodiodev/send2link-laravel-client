@@ -36,7 +36,7 @@ abstract class QueryBuilder
      */
     public function page($page, $pageSize = 25): self
     {
-        $this->addParameter('page', $page);
+        $this->addParameter('pageNumber', $page);
         $this->addParameter('pageSize', $pageSize);
 
         return $this;
@@ -48,7 +48,7 @@ abstract class QueryBuilder
      * @return Response
      * @throws AuthenticationException
      */
-    public function get(): Response
+    protected function performGet(): Response
     {
         $this->url = rtrim($this->url, '&');
 
@@ -95,7 +95,7 @@ abstract class QueryBuilder
      */
     public function json(): mixed
     {
-        return $this->get()->json();
+        return $this->performGet()->json();
     }
 
     /**
@@ -128,6 +128,17 @@ abstract class QueryBuilder
     public function queryUrl(): string
     {
         return rtrim($this->url, '&');
+    }
+
+    protected function parseItems(array $responseData): Collection
+    {
+        $items = [];
+
+        foreach ($responseData as $responseItem) {
+            $items[] = $this->parseItem($responseItem);
+        }
+
+        return collect($items);
     }
 
     /**

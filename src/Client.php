@@ -24,8 +24,8 @@ class Client
 
     public function __construct()
     {
-        $this->authorizationKey = config('send2link.server');
-        $this->server = config('send2link.authorization_key');
+        $this->server = config('send2link.server');
+        $this->authorizationKey = config('send2link.authorization_key');
     }
 
     /**
