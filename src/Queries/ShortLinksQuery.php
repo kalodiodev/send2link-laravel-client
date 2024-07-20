@@ -3,7 +3,7 @@
 namespace Kalodiodev\Send2Link\Queries;
 
 use Illuminate\Http\Client\RequestException;
-use Kalodiodev\Send2Link\Client;
+use Kalodiodev\Send2Link\Send2LinkClient;
 use Kalodiodev\Send2Link\Models\ShortLink;
 use Kalodiodev\Send2Link\Response\ItemResponse;
 use Kalodiodev\Send2Link\Response\PageResponse;
@@ -17,10 +17,10 @@ class ShortLinksQuery extends QueryBuilder
     private string $projectUuid;
 
     /**
-     * @param Client $client
+     * @param Send2LinkClient $client
      * @param string $projectUuid the project's UUID
      */
-    public function __construct(Client $client, string $projectUuid)
+    public function __construct(Send2LinkClient $client, string $projectUuid)
     {
         parent::__construct($client);
 

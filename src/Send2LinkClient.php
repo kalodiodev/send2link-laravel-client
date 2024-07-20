@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Http;
 use Kalodiodev\Send2Link\Queries\ProjectsQuery;
 use Kalodiodev\Send2Link\Queries\ShortLinksQuery;
 
-class Client
+class Send2LinkClient
 {
     private string $server;
     private string $authorizationKey;

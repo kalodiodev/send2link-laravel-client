@@ -5,13 +5,13 @@ namespace Kalodiodev\Send2Link\Queries;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Collection;
-use Kalodiodev\Send2Link\Client;
+use Kalodiodev\Send2Link\Send2LinkClient;
 use Kalodiodev\Send2Link\Response\ItemResponse;
 use Kalodiodev\Send2Link\Response\PageResponse;
 
 abstract class QueryBuilder
 {
-    protected Client $client;
+    protected Send2LinkClient $client;
     protected string $url;
     protected string $apiUrl = '';
 
@@ -22,7 +22,7 @@ abstract class QueryBuilder
      */
     protected string $resultsKey = '';
 
-    public function __construct(Client $client)
+    public function __construct(Send2LinkClient $client)
     {
         $this->client = $client;
         $this->url = $client->getBaseUrl() . $this->apiUrl . "?";
