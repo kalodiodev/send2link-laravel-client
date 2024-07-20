@@ -36,6 +36,9 @@ SEND2LINK_AUTH_KEY=api_key
 /* Get all projects */
 $client->projects()->page(page: 1, pageSize: 25)->getAll();
 
+/* Get project by UUID */
+$client->projects()->getByUuid($project_uuid);
+
 /* Create Project */
 $client->projects()->create('test name', 'test description');
 
@@ -51,6 +54,9 @@ $client->projects()->delete($project_uuid);
 ```php
 /* Get all shortlinks */
 $client->shortLinks($project_uuid)->page(page: 1, pageSize: 25)->getAll();
+
+/* Get shortlink by UUID */
+$client->shortLinks($project_uuid)->getByUuid($shortlink_uuid);
 
 /* Create ShortLink */
 $client->shortLinks($project_uuid)->create(destination: "https://example.com", enabled: true);
