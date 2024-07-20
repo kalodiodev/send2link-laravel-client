@@ -2,7 +2,7 @@
 
 namespace Kalodiodev\Send2Link\Queries;
 
-use Illuminate\Auth\AuthenticationException;
+use Illuminate\Http\Client\RequestException;
 use Kalodiodev\Send2Link\Models\Project;
 use Kalodiodev\Send2Link\Response\ItemResponse;
 use Kalodiodev\Send2Link\Response\PageResponse;
@@ -16,7 +16,7 @@ class ProjectsQuery extends QueryBuilder
      * Get all Projects
      *
      * @return PageResponse<Project>
-     * @throws AuthenticationException
+     * @throws RequestException
      */
     public function getAll(): PageResponse
     {
@@ -27,7 +27,7 @@ class ProjectsQuery extends QueryBuilder
      * Create Project
      *
      * @return ItemResponse<Project>
-     * @throws AuthenticationException
+     * @throws RequestException
      */
     public function create(string $name, string $description = null): ItemResponse
     {
@@ -40,7 +40,7 @@ class ProjectsQuery extends QueryBuilder
     /**
      * Update Project
      *
-     * @throws AuthenticationException
+     * @throws RequestException
      */
     public function update(string $uuid, string $name, string|null $description = null): void
     {

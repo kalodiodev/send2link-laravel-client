@@ -2,7 +2,7 @@
 
 namespace Kalodiodev\Send2Link\Queries;
 
-use Illuminate\Auth\AuthenticationException;
+use Illuminate\Http\Client\RequestException;
 use Kalodiodev\Send2Link\Client;
 use Kalodiodev\Send2Link\Models\ShortLink;
 use Kalodiodev\Send2Link\Response\ItemResponse;
@@ -33,7 +33,7 @@ class ShortLinksQuery extends QueryBuilder
      * Get all ShortLinks of project
      *
      * @return PageResponse<ShortLink>
-     * @throws AuthenticationException
+     * @throws RequestException
      */
     public function getAll(): PageResponse
     {
@@ -44,7 +44,7 @@ class ShortLinksQuery extends QueryBuilder
      * Create shortLink
      *
      * @return ItemResponse<ShortLink>
-     * @throws AuthenticationException
+     * @throws RequestException
      */
     public function create(string $destination, bool $enabled): ItemResponse
     {
@@ -57,7 +57,7 @@ class ShortLinksQuery extends QueryBuilder
     /**
      * Update ShortLink
      *
-     * @throws AuthenticationException
+     * @throws RequestException
      */
     public function update(string $shortLinkUuid, string $destination, bool $enabled): void
     {

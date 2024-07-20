@@ -2,8 +2,7 @@
 
 namespace Kalodiodev\Send2Link\Queries;
 
-use Exception;
-use Illuminate\Auth\AuthenticationException;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Collection;
 use Kalodiodev\Send2Link\Client;
@@ -46,7 +45,7 @@ abstract class QueryBuilder
     /**
      * Get page items
      *
-     * @throws AuthenticationException
+     * @throws RequestException
      */
     public function getAll(): PageResponse
     {
@@ -72,7 +71,7 @@ abstract class QueryBuilder
     /**
      * Get Item by UUID
      *
-     * @throws AuthenticationException
+     * @throws RequestException
      */
     public function getByUuid(string $uuid): ItemResponse
     {
@@ -88,7 +87,7 @@ abstract class QueryBuilder
     /**
      * Delete item
      *
-     * @throws Exception
+     * @throws RequestException
      */
     public function delete(string $uuid): void
     {
@@ -112,7 +111,7 @@ abstract class QueryBuilder
     /**
      * Make POST Request
      *
-     * @throws AuthenticationException
+     * @throws RequestException
      */
     protected function postRequest($data): ItemResponse
     {
@@ -129,7 +128,7 @@ abstract class QueryBuilder
      * Make GET request
      *
      * @return Response
-     * @throws AuthenticationException
+     * @throws RequestException
      */
     protected function getRequest(): Response
     {
@@ -141,24 +140,13 @@ abstract class QueryBuilder
     /**
      * Make Patch Request
      *
-     * @throws AuthenticationException
+     * @throws RequestException
      */
     protected function patchRequest($uuid, $data): void
     {
         $this->url = $this->client->getBaseUrl() . $this->apiUrl . '/' . $uuid;
 
         $this->client->patch($this->url, $data);
-    }
-
-    /**
-     * Results json
-     *
-     * @return array|mixed
-     * @throws AuthenticationException
-     */
-    public function json(): mixed
-    {
-        return $this->getRequest()->json();
     }
 
     /**
