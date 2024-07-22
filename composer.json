@@ -2,6 +2,8 @@
     "name": "kalodiodev/send2link",
     "description": "2ln.eu Url Shortener client",
     "version": "1.0.0",
+    "minimum-stability" : "dev",
+    "prefer-stable" : true,
     "autoload": {
         "psr-4": {
             "Kalodiodev\\Send2Link\\": "src/"
