@@ -4,17 +4,17 @@
     "version": "1.0.0",
     "minimum-stability" : "dev",
     "prefer-stable" : true,
-    "autoload": {
-        "psr-4": {
-            "Kalodiodev\\Send2Link\\": "src/"
-        }
-    },
     "authors": [
         {
             "name": "Raptodimos Athanasios",
             "email": "thanosra@gmail.com"
         }
     ],
+    "autoload": {
+        "psr-4": {
+            "Kalodiodev\\Send2Link\\": "src/"
+        }
+    },
     "require": {
         "illuminate/support": "^10",
         "illuminate/contracts": "^10",
@@ -23,5 +23,12 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^10.5"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Kalodiodev\\Send2Link\\Send2LinkServiceProvider"
+            ]
+        }
     }
 }

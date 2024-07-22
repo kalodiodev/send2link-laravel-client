@@ -17,10 +17,10 @@ class Send2LinkClient
     private string $server;
     private string $authorizationKey;
 
-    public function __construct()
+    public function __construct($server, $authorizationKey)
     {
-        $this->server = config('send2link.server');
-        $this->authorizationKey = config('send2link.authorization_key');
+        $this->server = $server;
+        $this->authorizationKey = $authorizationKey;
     }
 
     public function projects(): ProjectsQuery
