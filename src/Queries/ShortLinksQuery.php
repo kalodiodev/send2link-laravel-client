@@ -46,12 +46,18 @@ class ShortLinksQuery extends QueryBuilder
      * @return ItemResponse<ShortLink>
      * @throws RequestException
      */
-    public function create(string $destination, bool $enabled): ItemResponse
+    public function create(string $destination, bool $enabled, string $domain = null): ItemResponse
     {
-        return $this->postRequest([
+        $data = [
             'destination' => $destination,
             'enabled' => $enabled
-        ]);
+        ];
+
+        if ($domain !== null) {
+            $data['domain'] = $domain;
+        }
+
+        return $this->postRequest($data);
     }
 
     /**
@@ -67,7 +73,7 @@ class ShortLinksQuery extends QueryBuilder
         ]);
     }
 
-    protected function parseItem(array $item): ShortLink
+    protected function parseItem($item): ShortLink
     {
         return new ShortLink(
             $item['uuid'],

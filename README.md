@@ -49,6 +49,12 @@ $client->projects()->update($project_uuid, 'New name', 'New description');
 $client->projects()->delete($project_uuid);
 ```
 
+### Domains
+```php
+/* Get all available domains */
+$client->domains()->getAll();
+```
+
 ### ShortLinks
 
 ```php
@@ -58,8 +64,11 @@ $client->shortLinks($project_uuid)->page(page: 1, pageSize: 25)->getAll();
 /* Get shortlink by UUID */
 $client->shortLinks($project_uuid)->getByUuid($shortlink_uuid);
 
-/* Create ShortLink */
+/* Create ShortLink with Default domain */
 $client->shortLinks($project_uuid)->create(destination: "https://example.com", enabled: true);
+
+/* Create ShortLink with domain */
+$client->shortLinks($project_uuid)->create(destination: "https://example.com", enabled: true, domain: "2ln.eu");
 
 /* Update ShortLink */
 $client->shortLinks($project_uuid)->update($shortlink_uuid, destination: "https://github.com", enabled: false);

@@ -9,6 +9,7 @@ use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
+use Kalodiodev\Send2Link\Queries\DomainsQuery;
 use Kalodiodev\Send2Link\Queries\ProjectsQuery;
 use Kalodiodev\Send2Link\Queries\ShortLinksQuery;
 
@@ -31,6 +32,11 @@ class Send2LinkClient
     public function shortLinks(string $projectUuid): ShortLinksQuery
     {
         return new ShortLinksQuery($this, $projectUuid);
+    }
+
+    public function domains(): DomainsQuery
+    {
+        return new DomainsQuery($this);
     }
 
     protected function client(): PendingRequest

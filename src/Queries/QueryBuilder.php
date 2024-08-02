@@ -179,8 +179,8 @@ abstract class QueryBuilder
     /**
      * Parse results item to object
      *
-     * @param array $item
+     * @param $item
      * @return mixed
      */
-    abstract protected function parseItem(array $item): mixed;
+    abstract protected function parseItem($item): mixed;
 }

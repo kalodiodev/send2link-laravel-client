@@ -50,7 +50,7 @@ class ProjectsQuery extends QueryBuilder
         ]);
     }
 
-    protected function parseItem(array $item): Project
+    protected function parseItem($item): Project
     {
         return new Project(
             $item['uuid'],
