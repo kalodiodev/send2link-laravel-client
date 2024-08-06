@@ -46,7 +46,7 @@ class ShortLinksQuery extends QueryBuilder
      * @return ItemResponse<ShortLink>
      * @throws RequestException
      */
-    public function create(string $destination, bool $enabled, string $domain = null): ItemResponse
+    public function create(string $destination, bool $enabled, string $domain = null, string $expireInDays = null): ItemResponse
     {
         $data = [
             'destination' => $destination,
@@ -55,6 +55,10 @@ class ShortLinksQuery extends QueryBuilder
 
         if ($domain !== null) {
             $data['domain'] = $domain;
+        }
+
+        if ($expireInDays !== null) {
+            $data['expireInDays'] = $expireInDays;
         }
 
         return $this->postRequest($data);
@@ -80,8 +84,9 @@ class ShortLinksQuery extends QueryBuilder
             $item['link'],
             $item['destination'],
             $item['enabled'],
+            $item['expiresAt'],
             $item['createdAt'],
-            $item['updatedAt']
+            $item['updatedAt'],
         );
     }
 }

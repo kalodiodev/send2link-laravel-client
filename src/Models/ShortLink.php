@@ -8,6 +8,7 @@ class ShortLink
     private string $link;
     private string $destination;
     private bool $enabled;
+    private ?string $expiresAt;
     private string $createdAt;
     private string $updatedAt;
 
@@ -16,15 +17,17 @@ class ShortLink
      * @param string $link
      * @param string $destination
      * @param bool $enabled
+     * @param ?string $expiresAt
      * @param string $createdAt
      * @param string $updatedAt
      */
-    public function __construct(string $uuid, string $link, string $destination, bool $enabled, string $createdAt, string $updatedAt)
+    public function __construct(string $uuid, string $link, string $destination, bool $enabled, ?string $expiresAt, string $createdAt, string $updatedAt)
     {
         $this->uuid = $uuid;
         $this->link = $link;
         $this->destination = $destination;
         $this->enabled = $enabled;
+        $this->expiresAt = $expiresAt;
         $this->createdAt = $createdAt;
         $this->updatedAt = $updatedAt;
     }
@@ -47,6 +50,11 @@ class ShortLink
     public function isEnabled(): bool
     {
         return $this->enabled;
+    }
+
+    public function getExpiresAt(): ?string
+    {
+        return $this->expiresAt;
     }
 
     public function getCreatedAt(): string

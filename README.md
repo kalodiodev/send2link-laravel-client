@@ -70,6 +70,9 @@ $client->shortLinks($project_uuid)->create(destination: "https://example.com", e
 /* Create ShortLink with domain */
 $client->shortLinks($project_uuid)->create(destination: "https://example.com", enabled: true, domain: "2ln.eu");
 
+/* Create a ShortLink that will expire in a given number of days */
+$client->shortLinks($project_uuid)->create(destination: "https://example.com", enabled: true, expireInDays: 10);
+
 /* Update ShortLink */
 $client->shortLinks($project_uuid)->update($shortlink_uuid, destination: "https://github.com", enabled: false);
 
