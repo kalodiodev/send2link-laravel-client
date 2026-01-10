@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Kalodiodev\Send2Link\Response;
 
 /**
@@ -7,20 +9,16 @@ namespace Kalodiodev\Send2Link\Response;
  *
  * @template T
  */
-class ItemResponse
+readonly class ItemResponse
 {
-    private int $status;
-    private $item;
-
     /**
      * @param int $status
      * @param T $item
      */
-    public function __construct(int $status, $item)
-    {
-        $this->status = $status;
-        $this->item = $item;
-    }
+    public function __construct(
+        private int $status,
+        private mixed $item
+    ) {}
 
     /**
      * @return int status code
@@ -33,7 +31,7 @@ class ItemResponse
     /**
      * @return T model
      */
-    public function getItem()
+    public function getItem(): mixed
     {
         return $this->item;
     }

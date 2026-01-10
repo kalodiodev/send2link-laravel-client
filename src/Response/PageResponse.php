@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Kalodiodev\Send2Link\Response;
 
 use Illuminate\Support\Collection;
@@ -9,35 +11,28 @@ use Illuminate\Support\Collection;
  *
  * @template T
  */
-class PageResponse
+readonly class PageResponse
 {
-    protected Collection $items;
-    private int $status;
-    private int $page;
-    private int $pageSize;
-    private int $pagesCount;
-    private bool $isLast;
-    private bool $isFirst;
-
     /**
      * @param int $status
      * @param int $page
      * @param int $pageSize
      * @param int $pagesCount
+     * @param int $totalElements
      * @param bool $isFirst
      * @param bool $isLast
      * @param Collection<T> $items
      */
-    public function __construct(int $status, int $page, int $pageSize, int $pagesCount, bool $isFirst, bool $isLast, Collection $items)
-    {
-        $this->status = $status;
-        $this->items = $items;
-        $this->page = $page;
-        $this->pageSize = $pageSize;
-        $this->pagesCount = $pagesCount;
-        $this->isFirst = $isFirst;
-        $this->isLast = $isLast;
-    }
+    public function __construct(
+        private int        $status,
+        private int        $page,
+        private int        $pageSize,
+        private int        $pagesCount,
+        private int        $totalElements,
+        private bool       $isFirst,
+        private bool       $isLast,
+        private Collection $items
+    ) {}
 
     /**
      * @return Collection<T> collection of T model
@@ -77,6 +72,14 @@ class PageResponse
     public function getPagesCount(): int
     {
         return $this->pagesCount;
+    }
+
+    /**
+     * @return int total elements
+     */
+    public function getTotalElements(): int
+    {
+        return $this->totalElements;
     }
 
     /**
