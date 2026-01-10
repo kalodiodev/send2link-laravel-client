@@ -1,23 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Kalodiodev\Send2Link\Models;
 
-class Project
+readonly class Project
 {
-    private string $uuid;
-    private string $name;
-    private ?string $description;
-    private string $createdAt;
-    private string $updatedAt;
-
-    public function __construct(string $uuid, string $name, ?string $description, string $createdAt, string $updatedAt)
-    {
-        $this->uuid = $uuid;
-        $this->name = $name;
-        $this->description = $description;
-        $this->createdAt = $createdAt;
-        $this->updatedAt = $updatedAt;
-    }
+    public function __construct(
+        public string  $uuid,
+        public string  $name,
+        public ?string $description,
+        public string  $createdAt,
+        public string  $updatedAt
+    ) {}
 
     public function getUuid(): string
     {

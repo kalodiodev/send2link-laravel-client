@@ -1,59 +1,49 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Kalodiodev\Send2Link;
 
-use Illuminate\Config\Repository;
-use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
-use Kalodiodev\Send2Link\Queries\DomainsQuery;
-use Kalodiodev\Send2Link\Queries\ProjectsQuery;
-use Kalodiodev\Send2Link\Queries\ShortLinksQuery;
+use Illuminate\Support\Facades\Log;
 
+/** @internal */
 class Send2LinkClient
 {
     private string $server;
     private string $authorizationKey;
+    private int $timeout;
 
-    public function __construct($server, $authorizationKey)
-    {
-        $this->server = $server;
+    public function __construct(
+        string $server,
+        string $authorizationKey,
+        int $timeout = 10
+    ) {
+        $this->server = rtrim($server, '/');
         $this->authorizationKey = $authorizationKey;
-    }
-
-    public function projects(): ProjectsQuery
-    {
-        return new ProjectsQuery($this);
-    }
-
-    public function shortLinks(string $projectUuid): ShortLinksQuery
-    {
-        return new ShortLinksQuery($this, $projectUuid);
-    }
-
-    public function domains(): DomainsQuery
-    {
-        return new DomainsQuery($this);
+        $this->timeout = $timeout;
     }
 
     protected function client(): PendingRequest
     {
         return Http::withHeaders([
-            'Authorization' => 'Bearer ' . $this->authorizationKey
-        ]);
+            'Authorization' => 'Bearer ' . $this->authorizationKey,
+            'Accept' => 'application/json',
+        ])->timeout($this->timeout);
     }
 
     /**
      * Get results
      *
-     * @param $url
+     * @param string $url
      * @return Response
-     * @throws RequestException
+     * @throws RequestException|ConnectionException
      */
-    public function get($url): Response
+    public function get(string $url): Response
     {
         $response = $this->client()->get($url);
 
@@ -65,19 +55,19 @@ class Send2LinkClient
     }
 
     /**
-     * Client HTTP put
+     * Client HTTP patch
      *
-     * @param $url
+     * @param string $url
      * @param $data
      * @return Response
-     * @throws RequestException
+     * @throws RequestException|ConnectionException
      */
-    public function patch($url, $data): Response
+    public function patch(string $url, $data): Response
     {
         $response = $this->client()->patch($url, $data);
 
         if ($response->clientError()) {
-            Log::error($response);
+            Log::error($response->body());
             $response->throw();
         }
 
@@ -87,15 +77,23 @@ class Send2LinkClient
     /**
      * Get Base url
      *
-     * @return Repository|Application|mixed
+     * @return string
      */
-    public function getBaseUrl(): mixed
+    public function getBaseUrl(): string
     {
         return $this->server;
     }
 
     /**
-     * @throws RequestException
+     * @return int
+     */
+    public function getTimeout(): int
+    {
+        return $this->timeout;
+    }
+
+    /**
+     * @throws RequestException|ConnectionException
      */
     public function delete(string $url): Response
     {
@@ -110,6 +108,7 @@ class Send2LinkClient
 
     /**
      * @throws RequestException
+     * @throws ConnectionException
      */
     public function post(string $url, array $data): Response
     {
