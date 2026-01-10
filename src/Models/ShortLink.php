@@ -1,36 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Kalodiodev\Send2Link\Models;
 
-class ShortLink
+readonly class ShortLink
 {
-    private string $uuid;
-    private string $link;
-    private string $destination;
-    private bool $enabled;
-    private ?string $expiresAt;
-    private string $createdAt;
-    private string $updatedAt;
-
-    /**
-     * @param string $uuid
-     * @param string $link
-     * @param string $destination
-     * @param bool $enabled
-     * @param ?string $expiresAt
-     * @param string $createdAt
-     * @param string $updatedAt
-     */
-    public function __construct(string $uuid, string $link, string $destination, bool $enabled, ?string $expiresAt, string $createdAt, string $updatedAt)
-    {
-        $this->uuid = $uuid;
-        $this->link = $link;
-        $this->destination = $destination;
-        $this->enabled = $enabled;
-        $this->expiresAt = $expiresAt;
-        $this->createdAt = $createdAt;
-        $this->updatedAt = $updatedAt;
-    }
+    public function __construct(
+        public string $uuid,
+        public string $link,
+        public string $destination,
+        public bool $enabled,
+        public ?string $expiresAt,
+        public string $createdAt,
+        public string $updatedAt
+    ) {}
 
     public function getUuid(): string
     {
